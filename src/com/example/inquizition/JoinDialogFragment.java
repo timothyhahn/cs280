@@ -1,0 +1,122 @@
+package com.example.inquizition;
+
+
+
+import android.app.Dialog;
+import android.app.DialogFragment;
+import android.content.Intent;
+import android.os.Bundle;
+import android.os.Handler;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
+import android.widget.ProgressBar;
+import android.widget.TextView;
+
+public class JoinDialogFragment extends DialogFragment {
+
+	JSONTask getQuizTask;
+	JoinActivity activity;
+	int id, secondsLeft, secondsInit;
+	QuizGame quizGame;
+	Handler handler;
+	ProgressBar progressBar;
+	TextView textSeconds;
+	DialogFragment self;
+	
+	
+	 public static JoinDialogFragment newInstance(int id, int secondsLeft, String name)
+	 {
+		 JoinDialogFragment frag = new JoinDialogFragment();
+		 
+		 Bundle args = new Bundle();
+		 args.putInt("id", id);
+		 args.putInt("secondsLeft", secondsLeft);
+		 args.putString("name", name);
+		 frag.setArguments(args);
+		 
+		 return frag;
+		 
+	 }
+	 
+	 @Override
+	 public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) 
+	 {
+		 Bundle bundle = this.getArguments();
+		 id = bundle.getInt("id");
+		 secondsLeft = bundle.getInt("secondsLeft");
+		 self = this;
+		 
+		 activity = (JoinActivity) this.getActivity();	
+		 handler = new Handler();
+
+		 secondsInit = secondsLeft;
+   		 
+		 System.out.println("onCreateView view = "+getView());
+
+		 return inflater.inflate(R.layout.dialog_join, container, false);
+		
+	 }
+	 
+	    Runnable getQuiz = new Runnable()
+	    {
+	    	@Override
+	    	public void run() {
+	    		
+	    		getQuizTask = new GetQuizTask(activity, "http://inquizition.us/quiz/"+id);
+
+	    		int progress = secondsInit - secondsLeft;
+	    		progressBar.setProgress(progress);
+	    		textSeconds.setText("Game starts in "+secondsLeft+" seconds...");
+	    		
+	    		if(secondsLeft > 0)
+	    		{
+	    			secondsLeft -=1;
+	    		}
+	    		
+	    		handler.postDelayed(getQuiz, 1000);
+	    		
+	    	}
+	    };
+	    
+	    
+	    
+	public void gotQuiz()
+	{	
+		if(getQuizTask.getResults() != null)
+		{
+			quizGame = (QuizGame) getQuizTask.getResults();  
+			startGame(quizGame);
+		}
+	    
+	}
+	 
+	private void startGame(QuizGame quizGame)
+	{
+		activity.startGame(quizGame);
+	}
+	
+	
+	@Override
+	public void onActivityCreated(Bundle savedInstanceState)
+	{
+		 super.onActivityCreated(savedInstanceState);
+		 textSeconds  = (TextView)getView().findViewById(R.id.textSeconds);
+  		 progressBar = (ProgressBar)getView().findViewById(R.id.progressBar1);
+  		 
+  		 progressBar.setMax(secondsInit);
+		
+		 getQuiz.run();
+		 
+	}
+	
+	
+	@Override
+	public Dialog onCreateDialog(Bundle savedInstanceState)
+	{
+		Dialog dialog = super.onCreateDialog(savedInstanceState);
+		return dialog;	
+	}
+	
+}

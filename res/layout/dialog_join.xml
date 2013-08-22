@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="150dp"
+    android:padding="20dp"
+    android:background="#8db6dc" >
+
+    
+        <TextView
+        android:id="@+id/textSeconds"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:textSize="20sp"
+        android:textColor="#ffffff"
+        android:text="Game starts in 25 seconds..." />
+    
+    
+    <ProgressBar
+        android:id="@+id/progressBar1"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="fill_parent"
+        android:indeterminateOnly="false"
+        android:progressDrawable="@android:drawable/progress_horizontal"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp" />
+
+
+
+</RelativeLayout>

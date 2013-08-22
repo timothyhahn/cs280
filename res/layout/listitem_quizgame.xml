@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:background="#5887b3" >
+    
+    <TextView
+        android:id="@+id/quizName"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:textSize="22sp"
+        android:textColor="#ffffff"
+        android:text="Test text" />
+
+</RelativeLayout>

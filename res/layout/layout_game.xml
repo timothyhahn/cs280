@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#8db6dc"
+    android:orientation="vertical" >
+    
+    <com.example.inquizition.AutoResizeTextView
+        android:id="@+id/questionText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="From 1701 to 1713 Europe was embroiled in what Americans call Queen Anne's War. What do Europeans call it?" 
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:textColor="#ffffff"
+        android:lineSpacingExtra="-5dp"
+        android:textSize="30sp"
+        android:singleLine="false"/>
+
+    <GridView
+        android:id="@+id/gridView1"
+        android:layout_width="match_parent"
+        android:layout_height="fill_parent"
+        android:numColumns="1" >
+    </GridView>
+
+</LinearLayout>

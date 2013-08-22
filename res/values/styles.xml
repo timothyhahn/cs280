@@ -12,9 +12,29 @@
         -->
     </style>
 
-    <!-- Application theme. -->
-    <style name="AppTheme" parent="AppBaseTheme">
-        <!-- All customizations that are NOT specific to a particular API-level can go here. -->
+        <!-- the theme applied to the application or activity -->
+
+<!-- 
+   	<style name="Theme.MyAppTheme" parent="android:style/Theme.Holo.Light">
+         <item name="android:actionBarStyle">@style/Theme.MyAppTheme.ActionBar</item>
     </style>
+    
+   <style name="Theme.MyAppTheme.ActionBar" parent="android:style/Widget.Holo.Light.ActionBar">
+        <item name="android:background">#043a6b</item>
+        <item name="android:titleTextStyle">@style/Theme.MyAppTheme.TitleTextStyle</item>
+        <item name="android:actionOverflowButtonStyle">@style/Theme.MyAppTheme.Overflow</item>
+    </style>
+    
+   <style name="Theme.MyAppTheme.TitleTextStyle" parent="android:style/TextAppearance.Holo.Widget.ActionBar.Title">
+ 	<item name="android:textColor">#ffffff</item>
+ 	
+ 	</style>
+ 	<style name="Theme.MyAppTheme.Overflow" parent="android:style/Widget.Holo.ActionButton.Overflow">
+    <item name="android:src">@drawable/ic_action_overflow</item>
+
+ </style>
+    
+     -->
 
 </resources>
+
