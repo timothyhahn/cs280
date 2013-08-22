@@ -1,6 +1,7 @@
 package com.example.inquizition;
 
 import java.util.ArrayList;
+import java.util.concurrent.Semaphore;
 
 import android.app.Activity;
 import android.app.DialogFragment;
@@ -12,6 +13,7 @@ import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -19,13 +21,17 @@ import android.widget.TextView;
 public class JoinActivity extends Activity{
 
 	private Handler handler;
+	private Handler handler2;
 	private Activity context;
-	JSONTask quizNameTask, getRunningQuizzesTask, getSecondsLeftTask;
+	JSONTask quizNameTask, getRunningQuizzesTask, getQuizTask;
+	ArrayList<GetSecondsLeftTask> getSecondsLeftTasks;
 	ArrayList<QuizGame> quizGames;
 	public int idToJoin;
 	JoinDialogFragment joinGameDialog;
 	QuizGame gameToJoin;
 	FragmentTransaction ft;
+	boolean dialogOpened = false;
+	Semaphore dialogOperation;
 	
 	@Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,16 +41,19 @@ public class JoinActivity extends Activity{
         super.onCreate(savedInstanceState);
         
         handler = new Handler();
+        handler2 = new Handler();
         quizGames = new ArrayList<QuizGame>();
+        dialogOperation = new Semaphore(1);
+        getSecondsLeftTasks = new ArrayList<GetSecondsLeftTask>();
         
         ListView l = (ListView)findViewById(R.id.listView1);
-        View footerView = ((LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.list_footer, null, false);
-        l.addFooterView(footerView);
+        //View footerView = ((LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.list_footer, null, false);
+        //l.addFooterView(footerView);
         TextView t = (TextView)findViewById(R.id.pleaseSelect);
         t.setText("Please select a game, "+Constants.username+":");
         
         getRunningQuizzes.run();
-		
+		getSecondsLeftForQuizzes.run();
 	}
 	
     Runnable getRunningQuizzes = new Runnable()
@@ -59,6 +68,23 @@ public class JoinActivity extends Activity{
 			
 		}
     	
+    };
+    
+    Runnable getSecondsLeftForQuizzes = new Runnable()
+    {
+    	@Override
+    	public void run() {
+    		
+    		for(QuizGame quizGame: quizGames)
+    		{
+    			GetSecondsLeftTask task = new GetSecondsLeftTask(context, "http://inquizition.us/quiz/seconds/"+quizGame.id, quizGame.id);
+    			System.out.println("running task for "+quizGame.id);
+    			getSecondsLeftTasks.add(task);
+    			task.execute();
+    		}
+    		
+    		handler2.postDelayed(getSecondsLeftForQuizzes, 500);
+    	}
     };
     
     
@@ -106,10 +132,6 @@ public class JoinActivity extends Activity{
         QuizArrayAdapter adapter = new QuizArrayAdapter(this, quizGames);
         
         ListView l = (ListView)findViewById(R.id.listView1);
-        
-
-        
-        
 
         l.setAdapter(adapter);
         adapter.notifyDataSetChanged();
@@ -136,15 +158,35 @@ public class JoinActivity extends Activity{
 		}
 		
 		idToJoin = id;
+
+		try {
+			dialogOperation.acquire();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		ft = getFragmentManager().beginTransaction();
+		joinGameDialog = JoinDialogFragment.newInstance(idToJoin, gameToJoin.secondsLeft, gameToJoin.name);
+		joinGameDialog.show(ft, "Join Game");
+		dialogOpened = true;
 		
-		getSecondsLeftTask = new GetSecondsLeftTask(this, "http://inquizition.us/quiz/seconds/"+id);
-		getSecondsLeftTask.execute();
+		dialogOperation.release();
 		
 	}
 	
 	public void startGame(QuizGame quizGame)
 	{
-		ft.remove(joinGameDialog);
+		try {
+			dialogOperation.acquire();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		joinGameDialog.dismiss();
+		dialogOpened = false;
+		
+		dialogOperation.release();
+		
 		Intent intent = new Intent(this, GameActivity.class);
 		intent.putExtra("quizGame", quizGame);
 		startActivity(intent);
@@ -159,22 +201,71 @@ public class JoinActivity extends Activity{
     
     public void gotSecondsLeft()
     {
-    	ft = getFragmentManager().beginTransaction();
-    	String result = (String)getSecondsLeftTask.getResults();
-    	int secondsLeft =  Integer.parseInt(result);
-		openJoinDialog(secondsLeft);
+    	try
+    	{
+    	
+    	int[] result = (int[])getSecondsLeftTasks.get(0).getResults();
+    	System.out.println(result);
+    	for(int i = 0; i < quizGames.size(); i++)
+    	{
+    		
+	    		if(quizGames.get(i).id == result[0])
+	    		{
+	    			quizGames.get(i).secondsLeft = result[1];
+	    			
+	    			try {
+	    				dialogOperation.acquire();
+	    			} catch (InterruptedException e) {
+	    				// TODO Auto-generated catch block
+	    				e.printStackTrace();
+	    			}
+	    			
+	    			
+	    			if(dialogOpened && idToJoin == quizGames.get(i).id)
+	    			{
+	    				joinGameDialog.updateText(quizGames.get(i).secondsLeft);
+	    				if(quizGames.get(i).secondsLeft == 0 || quizGames.get(i).secondsLeft > 500)
+	    				{
+	    					getQuizTask = new GetQuizTask(this, "http://inquizition.us/quiz/"+idToJoin);
+	    					getQuizTask.execute();
+	    				}
+	    			}
+	    			
+	    			if(quizGames.get(i).secondsLeft == 0 || quizGames.get(i).secondsLeft > 500)
+	    				quizGames.remove(i);
+	    			
+	    			
+	    			dialogOperation.release();
+	    		}
+    		
+    	}
+    	
+    	}
+    	catch(NullPointerException e)
+    	{
+    		return;
+    	}
+    	
+        QuizArrayAdapter adapter = new QuizArrayAdapter(this, quizGames);
+        
+        ListView l = (ListView)findViewById(R.id.listView1);
+
+        l.setAdapter(adapter);
+        adapter.notifyDataSetChanged();
+        getSecondsLeftTasks.remove(0);
+		
     }
     
-    private void openJoinDialog(int secondsLeft)
-    {
-    	joinGameDialog = JoinDialogFragment.newInstance(idToJoin, secondsLeft, gameToJoin.name);
-		joinGameDialog.show(ft, "Join Game");
-    	
-    }
+
 
 	public void gotQuiz() {
 		
-		joinGameDialog.gotQuiz();
+		System.out.println(getQuizTask.getResults());
+		if(getQuizTask.getResults() != null)
+		{
+			QuizGame quizGame = (QuizGame) getQuizTask.getResults();  
+			startGame(quizGame);
+		}
 		
 	}
 

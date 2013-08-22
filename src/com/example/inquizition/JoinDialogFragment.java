@@ -16,9 +16,10 @@ import android.widget.TextView;
 
 public class JoinDialogFragment extends DialogFragment {
 
-	JSONTask getQuizTask;
+	JSONTask getQuizTask, getSecondsLeftTask;
 	JoinActivity activity;
 	int id, secondsLeft, secondsInit;
+	
 	QuizGame quizGame;
 	Handler handler;
 	ProgressBar progressBar;
@@ -58,45 +59,7 @@ public class JoinDialogFragment extends DialogFragment {
 		 return inflater.inflate(R.layout.dialog_join, container, false);
 		
 	 }
-	 
-	    Runnable getQuiz = new Runnable()
-	    {
-	    	@Override
-	    	public void run() {
-	    		
-	    		getQuizTask = new GetQuizTask(activity, "http://inquizition.us/quiz/"+id);
-
-	    		int progress = secondsInit - secondsLeft;
-	    		progressBar.setProgress(progress);
-	    		textSeconds.setText("Game starts in "+secondsLeft+" seconds...");
-	    		
-	    		if(secondsLeft > 0)
-	    		{
-	    			secondsLeft -=1;
-	    		}
-	    		
-	    		handler.postDelayed(getQuiz, 1000);
-	    		
-	    	}
-	    };
-	    
-	    
-	    
-	public void gotQuiz()
-	{	
-		if(getQuizTask.getResults() != null)
-		{
-			quizGame = (QuizGame) getQuizTask.getResults();  
-			startGame(quizGame);
-		}
-	    
-	}
-	 
-	private void startGame(QuizGame quizGame)
-	{
-		activity.startGame(quizGame);
-	}
-	
+	   
 	
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState)
@@ -106,8 +69,6 @@ public class JoinDialogFragment extends DialogFragment {
   		 progressBar = (ProgressBar)getView().findViewById(R.id.progressBar1);
   		 
   		 progressBar.setMax(secondsInit);
-		
-		 getQuiz.run();
 		 
 	}
 	
@@ -119,4 +80,9 @@ public class JoinDialogFragment extends DialogFragment {
 		return dialog;	
 	}
 	
+	public void updateText(int secondsLeft)
+	{
+		textSeconds.setText("The game will begin in "+secondsLeft +"...");
+		progressBar.setProgress(secondsInit - secondsLeft);
+	}
 }

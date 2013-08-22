@@ -155,7 +155,6 @@ class GetRunningQuizzesTask extends JSONTask
 
 			catch(NullPointerException e)
 			{
-				System.out.println("No quizzes found");
 			}
 			
 
@@ -208,10 +207,11 @@ class GetQuizTask extends JSONTask
 class GetSecondsLeftTask extends JSONTask
 {
 	JoinActivity callback;
-
-	public GetSecondsLeftTask(Activity aCallback, String urlstr) {
+	int id;
+	
+	public GetSecondsLeftTask(Activity aCallback, String urlstr, int id) {
 		super(aCallback, urlstr);
-		
+		this.id = id;
 		callback = (JoinActivity)aCallback;
 		
 	}
@@ -226,7 +226,7 @@ class GetSecondsLeftTask extends JSONTask
 	@Override
 	void parseJson(String json) {
 	
-		result = json;
+		result = new int[]{id, Integer.parseInt(json)};
 	}
 	
 	

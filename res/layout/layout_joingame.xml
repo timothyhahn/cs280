@@ -1,26 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
     android:orientation="vertical"
     android:background="#8db6dc" >
 
-            <TextView
+    
+                <com.example.inquizition.AutoResizeTextView
             android:id="@+id/pleaseSelect"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:text="Please select a game: "
             android:layout_marginLeft="12dp"
-            android:textSize="22sp"
+            android:textSize="18sp"
             android:textColor="#ffffff"
             >
             
-        </TextView>
+        </com.example.inquizition.AutoResizeTextView>
+    
     
     <ListView
         android:id="@+id/listView1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_above="@+id/footerLayout"
+        android:layout_below="@+id/pleaseSelect"
+        android:divider="#efefef"
+        android:dividerHeight="1dp" >
     </ListView>
 
+        <LinearLayout
+            android:id="@+id/footerLayout"
+            android:layout_width="fill_parent"
+            android:layout_height="100dp"
+            android:layout_alignParentBottom="true"
+            android:gravity="center_horizontal"
+            android:orientation="vertical" >
+    
+    <TextView
+        android:id="@+id/textView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Don&apos;t see any names you like?"
+        android:textColor="#ffffff"
+        android:textSize="20sp" />
+
+    <ImageButton
+        android:layout_marginTop="10dp"
+        android:id="@+id/createGameButton"
+        android:layout_width="300dp"
+        android:layout_height="55dip"
+        android:background="@drawable/creategamebutton" />
+            
 </LinearLayout>
+
+</RelativeLayout>

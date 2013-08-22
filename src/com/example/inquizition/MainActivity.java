@@ -95,7 +95,7 @@ public class MainActivity extends Activity {
 				Constants.username = editText.getText().toString();
 				ArrayList<NameValuePair> params = new ArrayList<NameValuePair>();
 				params.add(new BasicNameValuePair("username", Constants.username));
-				postUsernameTask = new PostUsernameTask(context, "http://inquizition.us/login/", params);
+				postUsernameTask = new PostUsernameTask(context, "http://inquizition.us/login", params);
 				postUsernameTask.execute();
 			}
         	

@@ -45,6 +45,9 @@ public class QuizArrayAdapter extends ArrayAdapter<QuizGame> {
 		LayoutInflater inflater = (LayoutInflater)mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		View view = inflater.inflate(R.layout.listitem_quizgame, parent, false);
 		TextView quizName = ((TextView)view.findViewById(R.id.quizName));
+		TextView secondsLeft = ((TextView)view.findViewById(R.id.secondsLeft));
+		secondsLeft.setText("Game starts in "+quizGames.get(position).secondsLeft+" seconds");
+		secondsLeft.setTypeface(face);
 		quizName.setText(quizGames.get(position).name);
 		quizName.setTypeface(face);
 		

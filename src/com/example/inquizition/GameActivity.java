@@ -1,7 +1,9 @@
 package com.example.inquizition;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,82 +21,57 @@ import android.app.Activity;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.widget.GridView;
+import android.widget.ListView;
+import android.widget.TextView;
 
 public class GameActivity extends Activity  {
 
 	QuizGame quizGame;
 	PostAnswerTask task;
+	int questionPos = -1;
+	
 	
 	@Override
     protected void onCreate(Bundle savedInstanceState) {
     
-        setContentView(R.layout.layout_game);
-        super.onCreate(savedInstanceState);
+       setContentView(R.layout.layout_game);
+       super.onCreate(savedInstanceState);
         
-        Bundle bundle = this.getIntent().getExtras();
+       Bundle bundle = this.getIntent().getExtras();
 
-
-        quizGame = (QuizGame) bundle.getSerializable("quizGame");
-        		
-        GridView g = (GridView) findViewById(R.id.gridView1);
-        AnswerGridAdapter adapter = new AnswerGridAdapter(quizGame.questions[0].answers, this);
-        g.setAdapter(adapter);
-        
-        
+       quizGame = (QuizGame) bundle.getSerializable("quizGame");       		
+       loadNextQuestion();     
         
 	}
 	
-	public void answerClicked(int questionId, int answerId)
+	private void loadNextQuestion()
 	{
-		task = new PostAnswerTask(questionId, answerId);
+		questionPos += 1;
+		TextView t = (TextView) findViewById(R.id.questionText);
+		t.setText(quizGame.questions[questionPos].text);
+		ListView l = (ListView) findViewById(R.id.answerListView);
+        AnswerArrayAdapter adapter = new AnswerArrayAdapter(quizGame.questions[questionPos].answers, this);
+        l.setAdapter(adapter);
+	}
+	
+	public void answerClicked(int answerId)
+	{    
+        ArrayList<NameValuePair> params = new ArrayList<NameValuePair>(1);
+        params.add(new BasicNameValuePair("user_id", Integer.toString(Constants.user_id)));
+        params.add(new BasicNameValuePair("question_id", Integer.toString(quizGame.questions[questionPos].id)));
+        params.add(new BasicNameValuePair("answer_id", Integer.toString(answerId)));
+        
+		task = new PostAnswerTask(this, "http://www.inquizition.us/quiz/answer/"+quizGame.id, params);
 		task.execute();
+		loadNextQuestion();
 	}
 	
-	class PostAnswerTask extends AsyncTask<Void, Void, Void>
+	public void answerPosted()
 	{
-		int questionId, answerId;
-		
-		public PostAnswerTask(int questionId, int answerId)
-		{
-			this.questionId = questionId;
-			this.answerId = answerId;
-		}
-
-		@Override
-		protected Void doInBackground(Void... params) {
-			HttpClient httpclient = new DefaultHttpClient();
-		    InputStream is = null;
-		    HttpPost httppost = new HttpPost("http://www.inquizition.us/quiz/answer/"+quizGame.id);
-		    try {
-		        
-		        List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(1);
-		        nameValuePairs.add(new BasicNameValuePair("user_id", Integer.toString(quizGame.userId)));
-		        nameValuePairs.add(new BasicNameValuePair("question_id", Integer.toString(questionId)));
-		        nameValuePairs.add(new BasicNameValuePair("answer_id", Integer.toString(answerId)));
-		        httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs, "UTF-8"));
-	    
-		        HttpResponse response = httpclient.execute(httppost);
-		        HttpEntity entity = response.getEntity();
-		        
-		        if(entity != null)
-		        	is = entity.getContent();
-		        
-		        
-		    } catch (ClientProtocolException e) {
-		        // TODO Auto-generated catch block
-		    } catch (IOException e) {
-		        // TODO Auto-generated catch block
-		    }
-			return null;
-		}
-		
-		@Override
-		protected void onPostExecute(Void params)
-		{
-			
-		}
-		
+		System.out.println(task.getResults());
 	}
+	
+
 	
 
 	

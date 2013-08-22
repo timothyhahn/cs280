@@ -2,15 +2,25 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:background="#5887b3" >
+    android:background="#5887b3" 
+    android:padding="10dp">
     
     <TextView
         android:id="@+id/quizName"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:padding="10dp"
         android:textSize="22sp"
         android:textColor="#ffffff"
         android:text="Test text" />
+    
+    <TextView
+        android:id="@+id/secondsLeft"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textSize="18sp"
+        android:textColor="#ffffff"
+        android:layout_below="@+id/quizName"
+        android:text="Game starts in 20 seconds" />
+    
 
 </RelativeLayout>

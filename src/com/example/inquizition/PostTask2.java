@@ -1,9 +1,7 @@
 package com.example.inquizition;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,41 +12,43 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicHeader;
+import org.apache.http.protocol.HTTP;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import android.app.Activity;
 import android.os.AsyncTask;
 
-public abstract class PostTask extends AsyncTask<Void, Void, Void> {
+public abstract class PostTask2 extends AsyncTask<Void, Void, Void> {
 
 	InputStream is;
-	
+	JSONObject json;
 	Activity callback;
 	String urlstr;
-	ArrayList<NameValuePair> params;
 	
-	public PostTask(Activity callback, String urlstr, ArrayList<NameValuePair> params)
+	public PostTask2(Activity callback, String urlstr)
 	{
 		this.callback = callback;
 		this.urlstr = urlstr;
-		this.params = params;
-	}
-	
-	@Override
-	protected void onPostExecute(Void args)
-	{
-		this.callback();
+		json = new JSONObject();
 	}
 	
 	@Override
 	protected Void doInBackground(Void... args) {
 
 		HttpClient httpclient = new DefaultHttpClient();
+	    InputStream is = null;
 	    HttpPost httppost = new HttpPost(urlstr);
+	    
 	    
 	    try {
 	    	
-	        httppost.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
+	    	StringEntity se = new StringEntity(json.toString());
+	    	se.setContentType(new BasicHeader(HTTP.CONTENT_TYPE, "application/json"));
+	        httppost.setEntity(se);
 	        HttpResponse response = httpclient.execute(httppost);
 	        HttpEntity entity = response.getEntity();
 		
@@ -75,14 +75,21 @@ public abstract class PostTask extends AsyncTask<Void, Void, Void> {
 
 }
 
-class PostUsernameTask extends PostTask
+class PostUsernameTask extends PostTask2
 {
 	MainActivity activity;
 	
 	public PostUsernameTask(Activity callback, String urlstr,
-			ArrayList<NameValuePair> params) {
-		super(callback, urlstr, params);
+			String username) {
+		super(callback, urlstr);
 		activity = (MainActivity)callback;
+		
+		try {
+			json.put("username", Constants.username);
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 	}
 
@@ -96,11 +103,10 @@ class PostUsernameTask extends PostTask
 }
 
 
-class PostQuizTask extends PostTask
+class PostQuizTask extends PostTask2
 {
-	public PostQuizTask(Activity callback, String urlstr,
-			ArrayList<NameValuePair> params) {
-		super(callback, urlstr, params);
+	public PostQuizTask(Activity callback, String urlstr) {
+		super(callback, urlstr);
 		// TODO Auto-generated constructor stub
 	}
 
@@ -111,29 +117,3 @@ class PostQuizTask extends PostTask
 	}
 	
 }
-
-class PostAnswerTask extends PostTask
-{
-	StringBuilder sb;
-	GameActivity activity;
-	
-	public PostAnswerTask(Activity callback, String urlstr, ArrayList<NameValuePair> params)
-	{
-		super(callback, urlstr, params);
-		activity = (GameActivity)callback;
-	}
-
-	@Override
-	void callback() {
-		
-		activity.answerPosted();
-		
-	}
-	
-	public StringBuilder getAnswerResults()
-	{
-		return sb;
-	}
-
-}
-	

@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="320dp"
+    android:layout_width="fill_parent"
     android:layout_height="90dp"
     android:background="@drawable/answerbutton"
     android:orientation="horizontal"
      >
 
     <RelativeLayout
-        android:layout_width="60dp"
+        android:layout_width="0dp"
+        android:layout_weight="0.1875"
         android:layout_height="85dp">
     <TextView
         android:id="@+id/answerId"
@@ -23,18 +24,19 @@
     </RelativeLayout>
 	
     <RelativeLayout
-        android:layout_width="255dp"
+        android:layout_weight="0.796875"
+        android:layout_width="0dp"
         android:layout_height="85dp">
         
-        <com.example.inquizition.AutoResizeTextView
+        <TextView
             android:id="@+id/answerText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
             android:text=""
             android:textColor="#ffffff"
-            android:textSize="20dp" >
-</com.example.inquizition.AutoResizeTextView>
+            android:textSize="20dp" />
         
     </RelativeLayout>
 
