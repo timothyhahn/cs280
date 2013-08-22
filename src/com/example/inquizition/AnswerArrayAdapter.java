@@ -3,19 +3,24 @@ package com.example.inquizition;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-public class AnswerGridAdapter extends BaseAdapter {
+public class AnswerArrayAdapter extends ArrayAdapter<Answer> {
 
 	Answer[] answers;
 	Context c;
+	GameActivity activity;
 	
-	public AnswerGridAdapter(Answer[] answers, Context c)
+	public AnswerArrayAdapter(Answer[] answers, Context c)
 	{
+		super(c, R.layout.listitem_answer, answers); 
 		this.answers = answers;
 		this.c = c;
+		activity = (GameActivity)c;
 	}
 	
 	@Override
@@ -25,7 +30,7 @@ public class AnswerGridAdapter extends BaseAdapter {
 	}
 
 	@Override
-	public Object getItem(int position) {
+	public Answer getItem(int position) {
 		
 		return answers[position];
 	}
@@ -37,10 +42,20 @@ public class AnswerGridAdapter extends BaseAdapter {
 	}
 
 	@Override
-	public View getView(int position, View convertView, ViewGroup parent) {
+	public View getView(final int position, View convertView, ViewGroup parent) {
 		
 		LayoutInflater inflater = (LayoutInflater)c.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		View view = inflater.inflate(R.layout.listitem_answer, parent, false);
+		
+		view.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+
+				activity.answerClicked(answers[position].id);
+			}		
+		});
+		
 		
 		String answerId = "";
 		
