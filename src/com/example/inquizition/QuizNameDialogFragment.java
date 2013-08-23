@@ -14,8 +14,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 public class QuizNameDialogFragment extends DialogFragment {
@@ -60,6 +62,7 @@ public class QuizNameDialogFragment extends DialogFragment {
 			 
 		 Button button = (Button)getView().findViewById(R.id.button1);
 		 final EditText editText = (EditText)getView().findViewById(R.id.editTextUsername);
+		 final Spinner spinner = (Spinner)getView().findViewById(R.id.spinner1);
 		 TextView textView = (TextView)getView().findViewById(R.id.textUsername);
 		 
 		 textView.setText(requestText);
@@ -72,8 +75,15 @@ public class QuizNameDialogFragment extends DialogFragment {
 				public void onClick(View arg0) {
 					
 					final String editedText = editText.getText().toString();
-					doTaskClick(editedText);
-					params = new ArrayList<NameValuePair>();
+					final String seconds = (String)spinner.getSelectedItem();
+					final String hint = editText.getHint().toString();
+					
+					System.out.println(editedText);
+
+					if(!editedText.equals(""))
+						((MainActivity)getActivity()).quizNameConfirmed(editedText, seconds);
+					else
+						((MainActivity)getActivity()).quizNameConfirmed(hint, seconds);
 								
 				}
 			 
@@ -85,15 +95,11 @@ public class QuizNameDialogFragment extends DialogFragment {
 	public Dialog onCreateDialog(Bundle savedInstanceState)
 	{
 		Dialog dialog = super.onCreateDialog(savedInstanceState);
+		dialog.requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
 		dialog.setTitle(dialogTitle);
-		dialog.getWindow().setLayout(300, 200);
 		return dialog;	
 	}
 
-	public void doTaskClick(String editedText)
-	{
-		((MainActivity)getActivity()).quizNameConfirmed(editedText);
-	}
 	
 }
 

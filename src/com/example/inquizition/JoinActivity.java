@@ -3,6 +3,9 @@ package com.example.inquizition;
 import java.util.ArrayList;
 import java.util.concurrent.Semaphore;
 
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
+
 import android.app.Activity;
 import android.app.DialogFragment;
 import android.app.FragmentTransaction;
@@ -24,11 +27,13 @@ public class JoinActivity extends Activity{
 	private Handler handler2;
 	private Activity context;
 	JSONTask quizNameTask, getRunningQuizzesTask, getQuizTask;
+	PostTask postJoinTask;
 	ArrayList<GetSecondsLeftTask> getSecondsLeftTasks;
 	ArrayList<QuizGame> quizGames;
 	public int idToJoin;
 	JoinDialogFragment joinGameDialog;
 	QuizGame gameToJoin;
+	QuizGame joinedGame;
 	FragmentTransaction ft;
 	boolean dialogOpened = false;
 	Semaphore dialogOperation;
@@ -262,11 +267,22 @@ public class JoinActivity extends Activity{
 		
 		System.out.println(getQuizTask.getResults());
 		if(getQuizTask.getResults() != null)
-		{
-			QuizGame quizGame = (QuizGame) getQuizTask.getResults();  
-			startGame(quizGame);
+		{		
+			joinedGame = (QuizGame) getQuizTask.getResults();
+			
+			ArrayList<NameValuePair> usernameParams = new ArrayList<NameValuePair>();
+			usernameParams.add(new BasicNameValuePair("user_id", Constants.user_id));
+			postJoinTask = new PostJoinTask(this, "http://inquizition.us/quiz/join/"+joinedGame.id, usernameParams);
+			postJoinTask.execute();
+			
 		}
 		
+	}
+	
+	public void finalizeJoin()
+	{
+		System.out.println(postJoinTask.readInputStream().toString());
+		startGame(joinedGame);
 	}
 
 }

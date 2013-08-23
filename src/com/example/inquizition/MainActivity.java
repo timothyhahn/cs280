@@ -1,9 +1,11 @@
 package com.example.inquizition;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -76,7 +78,7 @@ public class MainActivity extends Activity {
 			public void onClick(View v) {
 
 				//If create game is clicked, get the quiz name
-				quizNameTask = new GetQuizNameTask(context, "http://www.inquizition.us/name");
+				quizNameTask = new GetQuizNameTask(context, "http://inquizition.us/name");
 				quizNameTask.execute();	
 			}
         	
@@ -115,11 +117,12 @@ public class MainActivity extends Activity {
 		//After quiz name is received, ask the user to confirm quiz name
 		String name = (String)quizNameTask.getResults();
 		ft = getFragmentManager().beginTransaction();
+		
 		quizNameDialog = QuizNameDialogFragment.newInstance("New Game", "Enter a name and click OK:", name);
 		quizNameDialog.show(ft, "New Game");
 	}
 	
-	public void quizNameConfirmed(String name)
+	public void quizNameConfirmed(String name, String seconds)
 	{
 		//After quiz name is confirmed, post the new quiz and the username.
 		EditText editText = (EditText) findViewById(R.id.editTextUsername);
@@ -128,19 +131,23 @@ public class MainActivity extends Activity {
 		ArrayList<NameValuePair> params = new ArrayList<NameValuePair>();
 		ArrayList<NameValuePair> usernameParams = new ArrayList<NameValuePair>();
 		params.add(new BasicNameValuePair("quiz_name", name));
+		params.add(new BasicNameValuePair("seconds", seconds));
 		usernameParams.add(new BasicNameValuePair("username", Constants.username));
 		
 		postQuizTask = new PostQuizTask(this, "http://inquizition.us/quiz/create", params);
 		postQuizTask.execute();
 		postUsernameTask = new PostUsernameTask(this, "http://inquizition.us/login", usernameParams);
 		postUsernameTask.execute();
+		quizNameDialog.dismiss();
 	}
 	
 	
     public void postedQuiz()
     {
-	
+    	InputStream is = postQuizTask.getResults();
 		isQuizPosted = true;
+
+		System.out.println(postQuizTask.readInputStream().toString());
 		
 		//Avoids race condition. Waits for user and quiz (if necessary) to be posted
 		if(isQuizPosted && isUsernamePosted)
@@ -150,10 +157,23 @@ public class MainActivity extends Activity {
 	public void postedUsername()
 	{
 		isUsernamePosted = true;
+		String json = postUsernameTask.readInputStream().toString();
+		Gson gson = new Gson();
+		JsonObject j = gson.fromJson(json, JsonObject.class);
 		
-		//Avoids race condition. Waits for user and quiz (if necessary) to be posted
-		if(isQuizPosted && isUsernamePosted)
-			goToJoin();
+		try
+		{
+			Constants.user_id = j.get("id").getAsString();
+		
+			//Avoids race condition. Waits for user and quiz (if necessary) to be posted
+			if(isQuizPosted && isUsernamePosted)
+				goToJoin();
+		}
+		
+		catch(NullPointerException e)
+		{
+			System.err.println("There was an error calling login.");
+		}
 	}
 	
 

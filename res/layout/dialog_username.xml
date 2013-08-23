@@ -1,38 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="200dp"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
     android:background="#8db6dc"
-    android:gravity="center_horizontal"
+    android:gravity="center_vertical|center_horizontal"
     android:orientation="vertical"
     android:padding="20dp" >
 
-            <TextView
-            android:id="@+id/textUsername"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="20dp"
-            android:text="Please choose a username: "
-            android:textColor="#ffffff"
-            android:textSize="20sp" />
+    <TextView
+        android:id="@+id/textUsername"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:text="Please choose a username: "
+        android:textColor="#ffffff"
+        android:textSize="18sp" />
+
+
+    <EditText
+        android:id="@+id/editTextUsername"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" 
+        android:layout_marginBottom="20dp">
+
+        <requestFocus />
+    </EditText>
     
-        <EditText
-            android:id="@+id/editTextUsername"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Guest"
-            
-            android:ems="10" >
+    
+        <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="How long until the game begins?"
+        android:textColor="#ffffff"
+        android:textSize="18sp" />
+    
+    <Spinner
+        android:id="@+id/spinner1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:entries="@array/durations">
+        
+        </Spinner>
 
-            <requestFocus />
-        </EditText>
-
-        <Button
-            android:id="@+id/button1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="OK" />
-
-
+    <Button
+        android:id="@+id/button1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="OK" />
 
 </LinearLayout>

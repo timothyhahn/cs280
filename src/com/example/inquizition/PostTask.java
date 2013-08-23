@@ -26,6 +26,10 @@ public abstract class PostTask extends AsyncTask<Void, Void, Void> {
 	Activity callback;
 	String urlstr;
 	ArrayList<NameValuePair> params;
+	HttpClient httpclient;
+	HttpPost httppost;
+	HttpResponse response;
+	HttpEntity entity;
 	
 	public PostTask(Activity callback, String urlstr, ArrayList<NameValuePair> params)
 	{
@@ -43,14 +47,14 @@ public abstract class PostTask extends AsyncTask<Void, Void, Void> {
 	@Override
 	protected Void doInBackground(Void... args) {
 
-		HttpClient httpclient = new DefaultHttpClient();
-	    HttpPost httppost = new HttpPost(urlstr);
+		httpclient = new DefaultHttpClient();
+	    httppost = new HttpPost(urlstr);
 	    
 	    try {
 	    	
 	        httppost.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
-	        HttpResponse response = httpclient.execute(httppost);
-	        HttpEntity entity = response.getEntity();
+	        response = httpclient.execute(httppost);
+	        entity = response.getEntity();
 		
 	        if(entity != null)
 	        	is = entity.getContent();
@@ -64,11 +68,40 @@ public abstract class PostTask extends AsyncTask<Void, Void, Void> {
 
 	    
 		return null;
+		
 	}
 	
 	public InputStream getResults()
 	{
 		return is;
+	}
+	
+	public StringBuilder readInputStream()
+	{
+		BufferedReader br = null;
+		StringBuilder sb = new StringBuilder();
+ 
+		String line;
+		try {
+ 
+			br = new BufferedReader(new InputStreamReader(is));
+			while ((line = br.readLine()) != null) {
+				sb.append(line);
+			}
+ 
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			if (br != null) {
+				try {
+					br.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		return sb;
+ 
 	}
 	
 	abstract void callback();
@@ -98,19 +131,45 @@ class PostUsernameTask extends PostTask
 
 class PostQuizTask extends PostTask
 {
+	MainActivity activity;
 	public PostQuizTask(Activity callback, String urlstr,
 			ArrayList<NameValuePair> params) {
 		super(callback, urlstr, params);
-		// TODO Auto-generated constructor stub
+		
+		activity = (MainActivity)callback;
 	}
 
 	@Override
 	void callback() {
-		// TODO Auto-generated method stub
 		
+		activity.postedQuiz();
+		
+
 	}
 	
 }
+
+class PostJoinTask extends PostTask
+{
+	JoinActivity activity;
+	
+	public PostJoinTask(Activity callback, String urlstr,
+			ArrayList<NameValuePair> params) {
+		super(callback, urlstr, params);
+		activity = (JoinActivity)callback;
+	}
+
+	@Override
+	void callback() {
+		
+		activity.finalizeJoin();
+	}
+
+	
+	
+	
+}
+
 
 class PostAnswerTask extends PostTask
 {

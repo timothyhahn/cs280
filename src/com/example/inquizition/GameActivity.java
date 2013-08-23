@@ -57,7 +57,7 @@ public class GameActivity extends Activity  {
 	public void answerClicked(int answerId)
 	{    
         ArrayList<NameValuePair> params = new ArrayList<NameValuePair>(1);
-        params.add(new BasicNameValuePair("user_id", Integer.toString(Constants.user_id)));
+        params.add(new BasicNameValuePair("user_id", Constants.user_id));
         params.add(new BasicNameValuePair("question_id", Integer.toString(quizGame.questions[questionPos].id)));
         params.add(new BasicNameValuePair("answer_id", Integer.toString(answerId)));
         
