@@ -24,16 +24,19 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Debug;
 import android.os.Handler;
+import android.os.StrictMode;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
+import android.view.inputmethod.InputMethodManager;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -45,6 +48,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -68,8 +72,26 @@ public class MainActivity extends Activity {
         setContentView(R.layout.new_home);
         super.onCreate(savedInstanceState);
 
+        //StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        //StrictMode.setThreadPolicy(policy);
+        
         ImageButton createGameButton = (ImageButton) findViewById(R.id.createGameButton);
         ImageButton joinGameButton = (ImageButton) findViewById(R.id.joinGameButton);
+        
+        LinearLayout layout = (LinearLayout)findViewById(R.id.linearLayout1);       
+        layout.setOnClickListener(new OnClickListener()
+        {
+
+			@Override
+			public void onClick(View view) {
+				EditText editText = (EditText) findViewById(R.id.editTextUsername);
+				editText.clearFocus();
+			    InputMethodManager imm = (InputMethodManager) view.getContext()
+			            .getSystemService(Context.INPUT_METHOD_SERVICE);
+			    imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+			}
+        	
+        });
         
         createGameButton.setOnClickListener(new OnClickListener()
         {
@@ -144,9 +166,8 @@ public class MainActivity extends Activity {
 	
     public void postedQuiz()
     {
-    	InputStream is = postQuizTask.getResults();
-		isQuizPosted = true;
 
+		isQuizPosted = true;
 		System.out.println(postQuizTask.readInputStream().toString());
 		
 		//Avoids race condition. Waits for user and quiz (if necessary) to be posted
@@ -187,6 +208,7 @@ public class MainActivity extends Activity {
         return true;
     }
 
+    
 
 
 

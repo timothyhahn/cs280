@@ -1,26 +1,12 @@
 package com.example.inquizition;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.List;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 
 import android.app.Activity;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.widget.GridView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -40,7 +26,7 @@ public class GameActivity extends Activity  {
        Bundle bundle = this.getIntent().getExtras();
 
        quizGame = (QuizGame) bundle.getSerializable("quizGame");       		
-       loadNextQuestion();     
+       loadNextQuestion();
         
 	}
 	
@@ -56,23 +42,22 @@ public class GameActivity extends Activity  {
 	
 	public void answerClicked(int answerId)
 	{    
-        ArrayList<NameValuePair> params = new ArrayList<NameValuePair>(1);
+        ArrayList<NameValuePair> params = new ArrayList<NameValuePair>();
         params.add(new BasicNameValuePair("user_id", Constants.user_id));
         params.add(new BasicNameValuePair("question_id", Integer.toString(quizGame.questions[questionPos].id)));
-        params.add(new BasicNameValuePair("answer_id", Integer.toString(answerId)));
+        params.add(new BasicNameValuePair("answer", Integer.toString(answerId)));
         
-		task = new PostAnswerTask(this, "http://www.inquizition.us/quiz/answer/"+quizGame.id, params);
+		task = new PostAnswerTask(this, "http://inquizition.us/quiz/answer/"+quizGame.id, params);
 		task.execute();
-		loadNextQuestion();
+		
 	}
 	
 	public void answerPosted()
 	{
-		System.out.println(task.getResults());
+		System.out.println(task.readInputStream().toString());
+		loadNextQuestion();
 	}
 	
 
-	
-
-	
 }
+

@@ -9,12 +9,15 @@ import org.apache.http.message.BasicNameValuePair;
 
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnFocusChangeListener;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
 import android.view.Window;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
@@ -26,6 +29,7 @@ public class QuizNameDialogFragment extends DialogFragment {
 	String defaultText;
 	String dialogTitle;
 	ArrayList<NameValuePair> params;
+	
 	public QuizNameDialogFragment()
 	{
 		
@@ -51,7 +55,7 @@ public class QuizNameDialogFragment extends DialogFragment {
 		 requestText = bundle.getString("requestText");
 		 defaultText = bundle.getString("defaultText");
 		 dialogTitle = bundle.getString("dialogTitle");
-		 
+		 getDialog().setTitle(dialogTitle);
 		 return inflater.inflate(R.layout.dialog_username, container, false);
 	}
 
@@ -62,6 +66,25 @@ public class QuizNameDialogFragment extends DialogFragment {
 			 
 		 Button button = (Button)getView().findViewById(R.id.button1);
 		 final EditText editText = (EditText)getView().findViewById(R.id.editTextUsername);
+		 
+		 editText.setOnFocusChangeListener(new OnFocusChangeListener()
+		 {
+
+			@Override
+			public void onFocusChange(View v, boolean hasFocus) {
+				
+				if(!hasFocus)
+				{
+				editText.clearFocus();
+			    InputMethodManager imm = (InputMethodManager) v.getContext()
+			            .getSystemService(Context.INPUT_METHOD_SERVICE);
+			    imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+				}
+			}
+			 
+		 });
+				 
+		 
 		 final Spinner spinner = (Spinner)getView().findViewById(R.id.spinner1);
 		 TextView textView = (TextView)getView().findViewById(R.id.textUsername);
 		 
@@ -95,8 +118,7 @@ public class QuizNameDialogFragment extends DialogFragment {
 	public Dialog onCreateDialog(Bundle savedInstanceState)
 	{
 		Dialog dialog = super.onCreateDialog(savedInstanceState);
-		dialog.requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
-		dialog.setTitle(dialogTitle);
+
 		return dialog;	
 	}
 

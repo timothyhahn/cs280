@@ -30,6 +30,7 @@ public abstract class PostTask extends AsyncTask<Void, Void, Void> {
 	HttpPost httppost;
 	HttpResponse response;
 	HttpEntity entity;
+	StringBuilder sb;
 	
 	public PostTask(Activity callback, String urlstr, ArrayList<NameValuePair> params)
 	{
@@ -41,8 +42,32 @@ public abstract class PostTask extends AsyncTask<Void, Void, Void> {
 	@Override
 	protected void onPostExecute(Void args)
 	{
+		BufferedReader br = null;
+		sb = new StringBuilder();
+
+		String line;
+		try {
+ 
+			br = new BufferedReader(new InputStreamReader(is));
+			while ((line = br.readLine()) != null) {
+				sb.append(line);
+			}
+ 
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			if (br != null) {
+				try {
+					br.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		
 		this.callback();
 	}
+	
 	
 	@Override
 	protected Void doInBackground(Void... args) {
@@ -77,31 +102,8 @@ public abstract class PostTask extends AsyncTask<Void, Void, Void> {
 	}
 	
 	public StringBuilder readInputStream()
-	{
-		BufferedReader br = null;
-		StringBuilder sb = new StringBuilder();
- 
-		String line;
-		try {
- 
-			br = new BufferedReader(new InputStreamReader(is));
-			while ((line = br.readLine()) != null) {
-				sb.append(line);
-			}
- 
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			if (br != null) {
-				try {
-					br.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		}
+	{	
 		return sb;
- 
 	}
 	
 	abstract void callback();
@@ -189,10 +191,6 @@ class PostAnswerTask extends PostTask
 		
 	}
 	
-	public StringBuilder getAnswerResults()
-	{
-		return sb;
-	}
 
 }
 	
