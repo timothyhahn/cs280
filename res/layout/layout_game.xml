@@ -5,29 +5,22 @@
     android:background="#8db6dc"
     >
     
-    <LinearLayout android:layout_width="fill_parent"
-                  android:id="@+id/home_layout"
-                  android:orientation="vertical"
-                  android:layout_height="wrap_content">
-    
-    <com.example.inquizition.AutoResizeTextView
+    <TextView
         android:id="@+id/questionText"
         android:layout_width="fill_parent"
         android:layout_height="100dp"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
-        android:gravity="top"
+        android:layout_alignParentTop="true"
         android:singleLine="false"
         android:text="From 1701 to 1713 Europe was embroiled in what Americans call Queen Anne&apos;s War. What do Europeans call it?"
         android:textColor="#ffffff"
         android:textSize="18sp" />
-    </LinearLayout>
 
   <LinearLayout android:layout_width="fill_parent"
-                  android:layout_height="wrap_content"
-                  android:layout_gravity="bottom"
+                  android:layout_height="fill_parent"
                   android:layout_alignParentBottom="true"
-                  android:layout_below="@+id/home_layout"
+                  android:layout_below="@+id/questionText"
                   android:orientation="vertical">
 
       <LinearLayout
@@ -64,10 +57,10 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:numColumns="1"
-		android:layout_gravity="bottom">
+		>
 
     </ListView>
     
     </LinearLayout>
-
 </RelativeLayout>
+

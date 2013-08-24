@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -53,46 +54,34 @@ public class QuizArrayAdapter extends ArrayAdapter<QuizGame> {
 		quizName.setText(quizGames.get(position).name);
 		quizName.setTypeface(face);
 		
-		view.setOnTouchListener(new OnTouchListener()
-		{
-
+		OnTouchListener otl = new OnTouchListener()
+        {
+			
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
+	
+				if(event.getAction() == MotionEvent.ACTION_DOWN)
+				{
+					v.setBackgroundColor(Color.argb(255, 88, 135, 179));
+				}
 				
-				return false;
+				if(event.getAction() == MotionEvent.ACTION_UP)
+				{
+					v.setEnabled(false);
+					v.setBackgroundColor(Color.argb(255, 57, 88, 117));
+					activity.joinGame(quizGames.get(position).id);
+				}
+				
+				return true;
 			}
 			
-		});
-				
+        };
 		
-		view.setOnClickListener( new OnClickListener()
-		{
-			@Override
-			public void onClick(View view)
-			{
-				
-				activity.joinGame(quizGames.get(position).id);
-				
-				//((TextView)((Activity)mContext).findViewById(R.id.quizName)).setText(quizGames.get(position).name);
-				
-				
-				//((Activity)mContext).findViewById(R.id.imageView1).setBackgroundResource(R.drawable.gradientbg);
-				//updateView(position);
-				
-			}
-		});
-		
-		
+        view.findViewById(R.id.quizGameItem).setOnTouchListener(otl);
+        
+        
 		return view;
-		
 	}
 	
-	
-	private void updateView(int index)
-	{
-		ListView v = ((ListView)((Activity)mContext).findViewById(R.id.listView1));
-		v.getChildAt(index);
-		v.findViewById(R.id.imageView1);
-	}
 	
 }

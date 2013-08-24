@@ -2,6 +2,8 @@ package com.example.inquizition;
 
 import java.util.ArrayList;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
@@ -15,28 +17,35 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnTouchListener;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.GridView;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 
-public class JoinActivity extends Activity{
+public class JoinActivity extends Activity implements QuizCreator{
 
 	private Handler handler;
 	private Handler handler2;
 	private Activity context;
 	JSONTask quizNameTask, getRunningQuizzesTask, getQuizTask;
-	PostTask postJoinTask;
+	PostTask postJoinTask, postQuizTask;
 	ArrayList<GetSecondsLeftTask> getSecondsLeftTasks;
 	ArrayList<QuizGame> quizGames;
 	public int idToJoin;
 	JoinDialogFragment joinGameDialog;
+	QuizNameDialogFragment quizNameDialog;
 	QuizGame gameToJoin;
 	QuizGame joinedGame;
 	FragmentTransaction ft;
 	boolean dialogOpened = false;
-	Semaphore dialogOperation;
+	Lock dialogLock;
+	ImageButton createGameButton;
+	
 	
 	@Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,7 +57,7 @@ public class JoinActivity extends Activity{
         handler = new Handler();
         handler2 = new Handler();
         quizGames = new ArrayList<QuizGame>();
-        dialogOperation = new Semaphore(1);
+        dialogLock = new ReentrantLock();
         getSecondsLeftTasks = new ArrayList<GetSecondsLeftTask>();
         
         ListView l = (ListView)findViewById(R.id.listView1);
@@ -56,9 +65,76 @@ public class JoinActivity extends Activity{
         //l.addFooterView(footerView);
         TextView t = (TextView)findViewById(R.id.pleaseSelect);
         t.setText("Please select a game, "+Constants.username+":");
+        createGameButton = (ImageButton) findViewById(R.id.createGameButtonFromJoin);
+        
+        createGameButton.setOnTouchListener(new OnTouchListener()
+        {
+
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+	
+				if(event.getAction() == MotionEvent.ACTION_DOWN)
+				{
+					createGameButton.setBackgroundResource(R.drawable.creategamebuttontouched);
+				}
+				
+				if(event.getAction() == MotionEvent.ACTION_UP)
+				{
+					createGameButton.setEnabled(false);
+					createGameButton.setBackgroundResource(R.drawable.creategamebutton);
+					//If create game is clicked, get the quiz name
+					quizNameTask = new GetQuizNameTask(context, "http://inquizition.us/name");
+					quizNameTask.execute();	
+				}
+				
+				return true;
+			}
+        	
+        	
+        });
+        
         
         getRunningQuizzes.run();
 		getSecondsLeftForQuizzes.run();
+
+	}
+	
+	
+	@Override
+	protected void onResume()
+	{
+		super.onResume();
+		createGameButton.setEnabled(true);
+	}
+	
+	public void gotQuizName()
+	{
+		//After quiz name is received, ask the user to confirm quiz name
+		String name = (String)quizNameTask.getResults();
+		ft = getFragmentManager().beginTransaction();
+		
+		quizNameDialog = QuizNameDialogFragment.newInstance("New Game", "Enter a name and click OK:", name);
+		quizNameDialog.show(ft, "New Game");
+		createGameButton.setEnabled(true);
+	}
+	
+	public void quizNameConfirmed(String name, String seconds)
+	{
+		//After quiz name is confirmed, post the new quiz
+		ArrayList<NameValuePair> params = new ArrayList<NameValuePair>();
+		ArrayList<NameValuePair> usernameParams = new ArrayList<NameValuePair>();
+		params.add(new BasicNameValuePair("quiz_name", name));
+		params.add(new BasicNameValuePair("seconds", seconds));
+
+		postQuizTask = new PostQuizTask(this, "http://inquizition.us/quiz/create", params);
+		postQuizTask.execute();
+		quizNameDialog.dismiss();
+		createGameButton.setEnabled(true);
+	}
+	
+	public void postedQuiz()
+	{
+		System.out.println(postQuizTask.readInputStream().toString());
 	}
 	
     Runnable getRunningQuizzes = new Runnable()
@@ -80,12 +156,14 @@ public class JoinActivity extends Activity{
     	@Override
     	public void run() {
     		
+    		int count = 0;
     		for(QuizGame quizGame: quizGames)
     		{
-    			GetSecondsLeftTask task = new GetSecondsLeftTask(context, "http://inquizition.us/quiz/seconds/"+quizGame.id, quizGame.id);
+    			GetSecondsLeftTask task = new GetSecondsLeftTask(context, "http://inquizition.us/quiz/seconds/"+quizGame.id, quizGame.id, count);
     			System.out.println("running task for "+quizGame.id);
     			getSecondsLeftTasks.add(task);
     			task.execute();
+    			count += 1;
     		}
     		
     		handler2.postDelayed(getSecondsLeftForQuizzes, 500);
@@ -165,18 +243,13 @@ public class JoinActivity extends Activity{
 		
 		idToJoin = id;
 
-		try {
-			dialogOperation.acquire();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		dialogLock.lock();
 		ft = getFragmentManager().beginTransaction();
 		joinGameDialog = JoinDialogFragment.newInstance(idToJoin, gameToJoin.secondsLeft, gameToJoin.name);
 		joinGameDialog.show(ft, "Join Game");
 		dialogOpened = true;
 		
-		dialogOperation.release();
+		dialogLock.unlock();
 		
 		ArrayList<NameValuePair> usernameParams = new ArrayList<NameValuePair>();
 		usernameParams.add(new BasicNameValuePair("user_id", Constants.user_id));
@@ -187,16 +260,11 @@ public class JoinActivity extends Activity{
 	
 	public void startGame(QuizGame quizGame)
 	{
-		try {
-			dialogOperation.acquire();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		dialogLock.lock();
 		joinGameDialog.dismiss();
 		dialogOpened = false;
 		
-		dialogOperation.release();
+		dialogLock.unlock();
 		
 		Intent intent = new Intent(this, GameActivity.class);
 		intent.putExtra("quizGame", quizGame);
@@ -210,12 +278,12 @@ public class JoinActivity extends Activity{
         return true;
     }
     
-    public void gotSecondsLeft()
+    public void gotSecondsLeft(int taskIndex)
     {
     	try
     	{
     	
-    	int[] result = (int[])getSecondsLeftTasks.get(0).getResults();
+    	int[] result = (int[])getSecondsLeftTasks.get(taskIndex).getResults();
     	System.out.println(result);
     	for(int i = 0; i < quizGames.size(); i++)
     	{
@@ -224,12 +292,7 @@ public class JoinActivity extends Activity{
 	    		{
 	    			quizGames.get(i).secondsLeft = result[1];
 	    			
-	    			try {
-	    				dialogOperation.acquire();
-	    			} catch (InterruptedException e) {
-	    				// TODO Auto-generated catch block
-	    				e.printStackTrace();
-	    			}
+	    			dialogLock.lock();
 	    			
 	    			
 	    			if(dialogOpened && idToJoin == quizGames.get(i).id)
@@ -246,7 +309,7 @@ public class JoinActivity extends Activity{
 	    				quizGames.remove(i);
 	    			
 	    			
-	    			dialogOperation.release();
+	    			dialogLock.unlock();
 	    		}
     		
     	}
@@ -263,7 +326,7 @@ public class JoinActivity extends Activity{
 
         l.setAdapter(adapter);
         adapter.notifyDataSetChanged();
-        getSecondsLeftTasks.remove(0);
+        getSecondsLeftTasks.remove(taskIndex);
 		
     }
     
@@ -284,7 +347,6 @@ public class JoinActivity extends Activity{
 	public void finalizeJoin()
 	{
 		System.out.println(postJoinTask.readInputStream().toString());
-		
 	}
 
 }

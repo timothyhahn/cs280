@@ -88,11 +88,11 @@ abstract class JSONTask extends AsyncTask<Void, Void, Void> {
 class GetQuizNameTask extends JSONTask
 {
 
-	MainActivity callback;
+	QuizCreator callback;
 	
 	public GetQuizNameTask(Activity aCallback, String urlstr) {
 		super(aCallback, urlstr);
-		callback = (MainActivity)aCallback;
+		callback = (QuizCreator)aCallback;
 		
 	}
 
@@ -115,7 +115,6 @@ class GetQuizNameTask extends JSONTask
 
 class GetRunningQuizzesTask extends JSONTask
 {
-
 	ArrayList<QuizGame> quizGames;
 	JoinActivity callback;
 	public GetRunningQuizzesTask(Activity aCallback, String urlstr) {
@@ -207,10 +206,12 @@ class GetQuizTask extends JSONTask
 class GetSecondsLeftTask extends JSONTask
 {
 	JoinActivity callback;
+	int taskIndex;
 	int id;
 	
-	public GetSecondsLeftTask(Activity aCallback, String urlstr, int id) {
+	public GetSecondsLeftTask(Activity aCallback, String urlstr, int id, int taskIndex) {
 		super(aCallback, urlstr);
+		this.taskIndex = taskIndex;
 		this.id = id;
 		callback = (JoinActivity)aCallback;
 		
@@ -219,7 +220,7 @@ class GetSecondsLeftTask extends JSONTask
 	@Override
 	void doneTask() {
 		
-		callback.gotSecondsLeft();
+		callback.gotSecondsLeft(taskIndex);
 		
 	}
 

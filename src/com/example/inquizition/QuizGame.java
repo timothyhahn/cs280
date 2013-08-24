@@ -23,9 +23,6 @@ public class QuizGame implements Serializable {
 	public String name;
 	public int id;
 	public int secondsLeft;
-	public int userId;
-
-	public int numOfPlayers;
 	
 	public Question[] questions;
 	public Result[] results;

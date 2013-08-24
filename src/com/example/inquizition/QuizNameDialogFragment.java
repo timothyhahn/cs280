@@ -83,8 +83,7 @@ public class QuizNameDialogFragment extends DialogFragment {
 			}
 			 
 		 });
-				 
-		 
+
 		 final Spinner spinner = (Spinner)getView().findViewById(R.id.spinner1);
 		 TextView textView = (TextView)getView().findViewById(R.id.textUsername);
 		 
@@ -104,9 +103,9 @@ public class QuizNameDialogFragment extends DialogFragment {
 					System.out.println(editedText);
 
 					if(!editedText.equals(""))
-						((MainActivity)getActivity()).quizNameConfirmed(editedText, seconds);
+						((QuizCreator)getActivity()).quizNameConfirmed(editedText, seconds);
 					else
-						((MainActivity)getActivity()).quizNameConfirmed(hint, seconds);
+						((QuizCreator)getActivity()).quizNameConfirmed(hint, seconds);
 								
 				}
 			 

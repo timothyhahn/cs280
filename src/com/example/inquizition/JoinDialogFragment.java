@@ -53,7 +53,7 @@ public class JoinDialogFragment extends DialogFragment {
 		 handler = new Handler();
 
 		 secondsInit = secondsLeft;
-   		 
+   		 getDialog().setTitle("Joining Game");
 		 System.out.println("onCreateView view = "+getView());
 
 		 return inflater.inflate(R.layout.dialog_join, container, false);

@@ -133,12 +133,12 @@ class PostUsernameTask extends PostTask
 
 class PostQuizTask extends PostTask
 {
-	MainActivity activity;
+	QuizCreator activity;
 	public PostQuizTask(Activity callback, String urlstr,
 			ArrayList<NameValuePair> params) {
 		super(callback, urlstr, params);
 		
-		activity = (MainActivity)callback;
+		activity = (QuizCreator)callback;
 	}
 
 	@Override

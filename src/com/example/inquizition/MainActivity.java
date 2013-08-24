@@ -58,7 +58,7 @@ import android.widget.TextView;
 
 //Home screen activity
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements QuizCreator {
 
 	JSONTask quizNameTask, getRunningQuizzesTask;
 	PostTask postQuizTask, postUsernameTask;
@@ -66,6 +66,7 @@ public class MainActivity extends Activity {
 	QuizNameDialogFragment quizNameDialog;
 	FragmentTransaction ft;
 	boolean isQuizPosted, isUsernamePosted = false;
+	ImageButton createGameButton, joinGameButton;
 	
     @SuppressWarnings("unchecked")
 	@Override
@@ -78,8 +79,8 @@ public class MainActivity extends Activity {
         //StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         //StrictMode.setThreadPolicy(policy);
         
-        final ImageButton createGameButton = (ImageButton) findViewById(R.id.createGameButton);
-        final ImageButton joinGameButton = (ImageButton) findViewById(R.id.joinGameButton);
+        createGameButton = (ImageButton) findViewById(R.id.createGameButton);
+        joinGameButton = (ImageButton) findViewById(R.id.joinGameButton);    
         
         LinearLayout layout = (LinearLayout)findViewById(R.id.linearLayout1);       
         layout.setOnClickListener(new OnClickListener()
@@ -109,6 +110,7 @@ public class MainActivity extends Activity {
 				
 				if(event.getAction() == MotionEvent.ACTION_UP)
 				{
+					createGameButton.setEnabled(false);
 					createGameButton.setBackgroundResource(R.drawable.creategamebutton);
 					//If create game is clicked, get the quiz name
 					quizNameTask = new GetQuizNameTask(context, "http://inquizition.us/name");
@@ -136,13 +138,19 @@ public class MainActivity extends Activity {
 				if(event.getAction() == MotionEvent.ACTION_UP)
 				{
 					joinGameButton.setBackgroundResource(R.drawable.joingamebutton);
-					
+					joinGameButton.setEnabled(false);
 					//If join game is clicked, start the task to post username. 
 					isQuizPosted = true; //We don't need to get quiz name.
 					EditText editText = (EditText) findViewById(R.id.editTextUsername);
-					Constants.username = editText.getText().toString();
+					
+					if(!editText.equals(""))
+						Constants.username = "Guest";
+					else
+						Constants.username = editText.getText().toString();
+					
 					ArrayList<NameValuePair> params = new ArrayList<NameValuePair>();
 					params.add(new BasicNameValuePair("username", Constants.username));
+					
 					postUsernameTask = new PostUsernameTask(context, "http://inquizition.us/login", params);
 					postUsernameTask.execute();
 				}
@@ -154,6 +162,15 @@ public class MainActivity extends Activity {
 
     }   
 
+    @Override
+    protected void onResume()
+    {
+    	super.onResume();
+    	joinGameButton.setEnabled(true);
+    	createGameButton.setEnabled(true);
+    }
+    
+    
     public void goToJoin()
     {
     	Intent goToJoinActivity = new Intent(context, JoinActivity.class);
@@ -169,13 +186,18 @@ public class MainActivity extends Activity {
 		
 		quizNameDialog = QuizNameDialogFragment.newInstance("New Game", "Enter a name and click OK:", name);
 		quizNameDialog.show(ft, "New Game");
+		createGameButton.setEnabled(true);
 	}
 	
 	public void quizNameConfirmed(String name, String seconds)
 	{
 		//After quiz name is confirmed, post the new quiz and the username.
 		EditText editText = (EditText) findViewById(R.id.editTextUsername);
-		Constants.username = editText.getText().toString();
+		if(!editText.equals(""))
+			Constants.username = "Guest";
+		else
+			Constants.username = editText.getText().toString();
+		
 		
 		ArrayList<NameValuePair> params = new ArrayList<NameValuePair>();
 		ArrayList<NameValuePair> usernameParams = new ArrayList<NameValuePair>();
@@ -223,9 +245,6 @@ public class MainActivity extends Activity {
 			System.err.println("There was an error calling login.");
 		}
 	}
-	
-
-
 
     
     @Override

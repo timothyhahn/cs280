@@ -47,7 +47,7 @@
 
     <ImageButton
         android:layout_marginTop="10dp"
-        android:id="@+id/createGameButton"
+        android:id="@+id/createGameButtonFromJoin"
         android:layout_width="300dp"
         android:layout_height="55dip"
         android:background="@drawable/creategamebutton" />

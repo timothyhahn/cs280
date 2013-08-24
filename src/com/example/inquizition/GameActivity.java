@@ -10,6 +10,7 @@ import com.google.gson.JsonObject;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -29,26 +30,34 @@ public class GameActivity extends Activity  {
         
        Bundle bundle = this.getIntent().getExtras();
 
-       quizGame = (QuizGame) bundle.getSerializable("quizGame");       		
+       quizGame = (QuizGame) bundle.getSerializable("quizGame");     
+		TextView scoreText = (TextView) findViewById(R.id.scoreText);
+		scoreText.setText("Question 1/10");
        loadNextQuestion();
+       
         
 	}
 	
 	private void loadNextQuestion()
 	{
 		questionPos += 1;
-		
+
 		if(questionPos >= quizGame.questions.length)
 		{
 			Intent intent = new Intent(this, ResultsActivity.class);
 			intent.putExtra("quiz_id", quizGame.id);
+			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			this.startActivity(intent);
+			this.finish();
 		}
 		
 		else
 		{
 			TextView t = (TextView) findViewById(R.id.questionText);
 			t.setText(quizGame.questions[questionPos].text);
+			if(quizGame.questions[questionPos].text.length() > 100)
+				t.setTextSize(15);
+			
 			ListView l = (ListView) findViewById(R.id.answerListView);
 			AnswerArrayAdapter adapter = new AnswerArrayAdapter(quizGame.questions[questionPos].answers, this);
 			l.setAdapter(adapter);
@@ -89,15 +98,16 @@ public class GameActivity extends Activity  {
 			{
 				System.out.println("setting");
 				correctText.setText("Correct!");
-				//correctText.setTextColor(0x000055);
+				correctText.setTextColor(Color.argb(255, 0, 180, 0));
 			}
 			else
 			{
 				correctText.setText("Incorrect; "+text);
-				//correctText.setTextColor(0x880000);
+				correctText.setTextColor(Color.argb(255, 220, 0, 0));
 			}
 			
-			scoreText.setText("Score: "+Integer.toString(score));
+			scoreText.setText("Question "+(questionPos+1) + "/10; Score: "+Integer.toString(score));
+			
 		}
 		
 		catch(Exception e)

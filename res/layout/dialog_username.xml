@@ -3,7 +3,7 @@
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:background="#8db6dc"
-    android:gravity="center_vertical|center_horizontal"
+    android:gravity="center_vertical"
     android:orientation="vertical"
     android:padding="20dp" >
 
@@ -13,7 +13,8 @@
         android:layout_height="wrap_content"
         android:text="Please choose a username: "
         android:textColor="#ffffff"
-        android:textSize="18sp" />
+        android:textSize="18sp"
+        android:layout_marginLeft="10dp" />
 
 
     <EditText
@@ -31,7 +32,8 @@
         android:layout_height="wrap_content"
         android:text="How long until the game begins?"
         android:textColor="#ffffff"
-        android:textSize="18sp" />
+        android:textSize="18sp"
+        android:layout_marginLeft="10dp"  />
     
     <Spinner
         android:id="@+id/spinner1"
