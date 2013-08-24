@@ -28,6 +28,7 @@ public class QuizGame implements Serializable {
 	public int numOfPlayers;
 	
 	public Question[] questions;
+	public Result[] results;
 
 	
 	public QuizGame(int id, String name, int secondsLeft)
@@ -38,7 +39,16 @@ public class QuizGame implements Serializable {
 	}
 	
 
+
 }
+
+class Result implements Serializable
+{
+	int id;
+	String username;
+	int score;
+}
+
 
 class Question implements Serializable {
 

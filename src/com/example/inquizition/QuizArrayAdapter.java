@@ -6,8 +6,10 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
@@ -50,6 +52,18 @@ public class QuizArrayAdapter extends ArrayAdapter<QuizGame> {
 		secondsLeft.setTypeface(face);
 		quizName.setText(quizGames.get(position).name);
 		quizName.setTypeface(face);
+		
+		view.setOnTouchListener(new OnTouchListener()
+		{
+
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+				
+				return false;
+			}
+			
+		});
+				
 		
 		view.setOnClickListener( new OnClickListener()
 		{

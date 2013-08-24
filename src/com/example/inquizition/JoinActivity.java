@@ -147,6 +147,7 @@ public class JoinActivity extends Activity{
 	public void joinGame(int id) {
 		
 		gameToJoin = null;
+
 		
 		for(int i = 0; i < quizGames.size(); i++)
 		{
@@ -176,6 +177,11 @@ public class JoinActivity extends Activity{
 		dialogOpened = true;
 		
 		dialogOperation.release();
+		
+		ArrayList<NameValuePair> usernameParams = new ArrayList<NameValuePair>();
+		usernameParams.add(new BasicNameValuePair("user_id", Constants.user_id));
+		postJoinTask = new PostJoinTask(this, "http://inquizition.us/quiz/join/"+idToJoin, usernameParams);
+		postJoinTask.execute();
 		
 	}
 	
@@ -269,11 +275,7 @@ public class JoinActivity extends Activity{
 		if(getQuizTask.getResults() != null)
 		{		
 			joinedGame = (QuizGame) getQuizTask.getResults();
-			
-			ArrayList<NameValuePair> usernameParams = new ArrayList<NameValuePair>();
-			usernameParams.add(new BasicNameValuePair("user_id", Constants.user_id));
-			postJoinTask = new PostJoinTask(this, "http://inquizition.us/quiz/join/"+joinedGame.id, usernameParams);
-			postJoinTask.execute();
+			startGame(joinedGame);
 			
 		}
 		
@@ -282,7 +284,7 @@ public class JoinActivity extends Activity{
 	public void finalizeJoin()
 	{
 		System.out.println(postJoinTask.readInputStream().toString());
-		startGame(joinedGame);
+		
 	}
 
 }

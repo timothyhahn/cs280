@@ -5,7 +5,11 @@ import java.util.ArrayList;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -33,11 +37,22 @@ public class GameActivity extends Activity  {
 	private void loadNextQuestion()
 	{
 		questionPos += 1;
-		TextView t = (TextView) findViewById(R.id.questionText);
-		t.setText(quizGame.questions[questionPos].text);
-		ListView l = (ListView) findViewById(R.id.answerListView);
-        AnswerArrayAdapter adapter = new AnswerArrayAdapter(quizGame.questions[questionPos].answers, this);
-        l.setAdapter(adapter);
+		
+		if(questionPos >= quizGame.questions.length)
+		{
+			Intent intent = new Intent(this, ResultsActivity.class);
+			intent.putExtra("quiz_id", quizGame.id);
+			this.startActivity(intent);
+		}
+		
+		else
+		{
+			TextView t = (TextView) findViewById(R.id.questionText);
+			t.setText(quizGame.questions[questionPos].text);
+			ListView l = (ListView) findViewById(R.id.answerListView);
+			AnswerArrayAdapter adapter = new AnswerArrayAdapter(quizGame.questions[questionPos].answers, this);
+			l.setAdapter(adapter);
+		}
 	}
 	
 	public void answerClicked(int answerId)
@@ -53,8 +68,43 @@ public class GameActivity extends Activity  {
 	}
 	
 	public void answerPosted()
-	{
-		System.out.println(task.readInputStream().toString());
+	{	
+		TextView correctText = (TextView) findViewById(R.id.correctText);
+		TextView scoreText = (TextView) findViewById(R.id.scoreText);
+		String json = task.readInputStream().toString();
+		System.out.println(json);
+		
+		Gson gson = new Gson();
+		JsonObject j = gson.fromJson(json, JsonObject.class);
+		
+		try
+		{
+			String correct = j.get("correct").getAsString();
+			int score = j.get("score").getAsInt();
+			String text = j.get("text").getAsString();
+			
+			System.out.println(correct);
+			
+			if(correct.equals("True"))
+			{
+				System.out.println("setting");
+				correctText.setText("Correct!");
+				//correctText.setTextColor(0x000055);
+			}
+			else
+			{
+				correctText.setText("Incorrect; "+text);
+				//correctText.setTextColor(0x880000);
+			}
+			
+			scoreText.setText("Score: "+Integer.toString(score));
+		}
+		
+		catch(Exception e)
+		{
+			System.err.println("error parsing response");
+		}
+		
 		loadNextQuestion();
 	}
 	

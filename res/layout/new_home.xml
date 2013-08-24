@@ -69,7 +69,7 @@
             android:id="@+id/createGameButton"
             android:layout_width="300dp"
             android:layout_height="55dip"
-            android:background="@drawable/creategamebutton"
+            android:background="@drawable/createselector"
             android:layout_marginBottom="20dp" />
         	
         	 <ImageButton

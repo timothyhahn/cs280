@@ -43,19 +43,19 @@
           android:gravity="left"
           android:layout_height="wrap_content"
           android:layout_marginLeft="10dp" 
-          android:text="Correct!"       
-           android:textColor="#005500"
+          android:text=""       
+           android:textColor="#880000"
         android:textSize="18sp" />
       
             <TextView
-          android:id="@+id/correctText"
+          android:id="@+id/scoreText"
           android:layout_width="0dp"
           android:layout_weight="0.3"
           android:gravity="right"
           android:layout_height="wrap_content"
           android:layout_marginRight="10dp" 
-          android:text="Score: 272"       
-           android:textColor="#005500"
+          android:text=""       
+           android:textColor="#ffffff"
         android:textSize="18sp" />
       </LinearLayout>
 

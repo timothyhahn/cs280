@@ -231,3 +231,42 @@ class GetSecondsLeftTask extends JSONTask
 	
 	
 }
+
+
+class GetQuizResultsTask extends JSONTask
+{
+
+	ResultsActivity callback;
+	
+	public GetQuizResultsTask(Activity callback, String urlstr) {
+		super(callback, urlstr);
+		this.callback = (ResultsActivity)callback;
+	}
+
+	@Override
+	void doneTask() {
+		
+		callback.gotResults();
+		
+	}
+
+	@Override
+	void parseJson(String json) {
+		
+		Gson gson = new Gson();
+		
+		JsonObject j = gson.fromJson(json, JsonObject.class);
+		JsonArray ja = j.get("results").getAsJsonArray();
+		ArrayList<Result> results = new ArrayList<Result>();
+		
+		for(int i = 0; i < ja.size(); i++)
+		{
+			JsonElement je = ja.get(i);
+			Result quizResult = gson.fromJson(je, Result.class);
+			results.add(quizResult);
+		}
+
+		result = results;
+	}
+	
+}

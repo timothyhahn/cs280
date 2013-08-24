@@ -32,9 +32,12 @@ import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.view.Menu;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnTouchListener;
 import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
 
@@ -75,8 +78,8 @@ public class MainActivity extends Activity {
         //StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         //StrictMode.setThreadPolicy(policy);
         
-        ImageButton createGameButton = (ImageButton) findViewById(R.id.createGameButton);
-        ImageButton joinGameButton = (ImageButton) findViewById(R.id.joinGameButton);
+        final ImageButton createGameButton = (ImageButton) findViewById(R.id.createGameButton);
+        final ImageButton joinGameButton = (ImageButton) findViewById(R.id.joinGameButton);
         
         LinearLayout layout = (LinearLayout)findViewById(R.id.linearLayout1);       
         layout.setOnClickListener(new OnClickListener()
@@ -93,34 +96,58 @@ public class MainActivity extends Activity {
         	
         });
         
-        createGameButton.setOnClickListener(new OnClickListener()
+        createGameButton.setOnTouchListener(new OnTouchListener()
         {
 
 			@Override
-			public void onClick(View v) {
-
-				//If create game is clicked, get the quiz name
-				quizNameTask = new GetQuizNameTask(context, "http://inquizition.us/name");
-				quizNameTask.execute();	
+			public boolean onTouch(View v, MotionEvent event) {
+	
+				if(event.getAction() == MotionEvent.ACTION_DOWN)
+				{
+					createGameButton.setBackgroundResource(R.drawable.creategamebuttontouched);
+				}
+				
+				if(event.getAction() == MotionEvent.ACTION_UP)
+				{
+					createGameButton.setBackgroundResource(R.drawable.creategamebutton);
+					//If create game is clicked, get the quiz name
+					quizNameTask = new GetQuizNameTask(context, "http://inquizition.us/name");
+					quizNameTask.execute();	
+				}
+				
+				return true;
 			}
+        	
         	
         });
         
         
-        joinGameButton.setOnClickListener(new OnClickListener()
+        joinGameButton.setOnTouchListener(new OnTouchListener()
         {
 
 			@Override
-			public void onClick(View v) {
+			public boolean onTouch(View v, MotionEvent event) {
 				
-				//If join game is clicked, start the task to post username. 
-				isQuizPosted = true; //We don't need to get quiz name.
-				EditText editText = (EditText) findViewById(R.id.editTextUsername);
-				Constants.username = editText.getText().toString();
-				ArrayList<NameValuePair> params = new ArrayList<NameValuePair>();
-				params.add(new BasicNameValuePair("username", Constants.username));
-				postUsernameTask = new PostUsernameTask(context, "http://inquizition.us/login", params);
-				postUsernameTask.execute();
+				if(event.getAction() == MotionEvent.ACTION_DOWN)
+				{
+					joinGameButton.setBackgroundResource(R.drawable.joingamebuttontouched);
+				}
+				
+				if(event.getAction() == MotionEvent.ACTION_UP)
+				{
+					joinGameButton.setBackgroundResource(R.drawable.joingamebutton);
+					
+					//If join game is clicked, start the task to post username. 
+					isQuizPosted = true; //We don't need to get quiz name.
+					EditText editText = (EditText) findViewById(R.id.editTextUsername);
+					Constants.username = editText.getText().toString();
+					ArrayList<NameValuePair> params = new ArrayList<NameValuePair>();
+					params.add(new BasicNameValuePair("username", Constants.username));
+					postUsernameTask = new PostUsernameTask(context, "http://inquizition.us/login", params);
+					postUsernameTask.execute();
+				}
+				
+				return true;
 			}
         	
         });
